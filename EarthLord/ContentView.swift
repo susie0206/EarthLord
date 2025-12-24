@@ -35,7 +35,22 @@ struct ContentView: View {
                 }
             }
         } detail: {
-            Text("Select an item")
+            NavigationStack {
+                VStack(spacing: 20) {
+                    Text("Select an item")
+                        .font(.title)
+
+                    NavigationLink(destination: TestView()) {
+                        Text("进入测试页")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: 200)
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                    }
+                }
+            }
         }
     }
 

@@ -1,0 +1,28 @@
+//
+//  TestView.swift
+//  EarthLord
+//
+//  Created by 快乐一家人 on 2025/12/24.
+//
+
+import SwiftUI
+
+struct TestView: View {
+    var body: some View {
+        ZStack {
+            // 淡蓝色背景
+            Color(red: 0.7, green: 0.85, blue: 1.0)
+                .ignoresSafeArea()
+
+            // 大标题
+            Text("这里是分支宇宙的测试页")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+        }
+    }
+}
+
+#Preview {
+    TestView()
+}
