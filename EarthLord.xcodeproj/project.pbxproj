@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A86E5FBB2EFEBBF400592EC9 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = A86E5FBA2EFEBBF400592EC9 /* Supabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		A8B10ABC2EFACC7B00E13C4C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A86E5FBB2EFEBBF400592EC9 /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = EarthLord;
 			packageProductDependencies = (
+				A86E5FBA2EFEBBF400592EC9 /* Supabase */,
 			);
 			productName = EarthLord;
 			productReference = A8B10AAC2EFACC7A00E13C4C /* EarthLord.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = A8B10AA32EFACC7A00E13C4C;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A86E5FB92EFEBBF400592EC9 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A8B10AAD2EFACC7A00E13C4C /* Products */;
 			projectDirPath = "";
@@ -578,6 +587,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A86E5FB92EFEBBF400592EC9 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A86E5FBA2EFEBBF400592EC9 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A86E5FB92EFEBBF400592EC9 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A8B10AA42EFACC7A00E13C4C /* Project object */;
 }
