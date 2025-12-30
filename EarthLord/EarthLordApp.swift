@@ -10,6 +10,10 @@ import SwiftData
 
 @main
 struct EarthLordApp: App {
+    /// 认证管理器（应用级别的单例）
+    @StateObject private var authManager = AuthManager()
+
+    /// SwiftData 模型容器
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
@@ -26,6 +30,7 @@ struct EarthLordApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .environmentObject(authManager)
         }
         .modelContainer(sharedModelContainer)
     }
