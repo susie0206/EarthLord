@@ -11,6 +11,12 @@ struct ProfileTabView: View {
     /// 认证管理器
     @EnvironmentObject var authManager: AuthManager
 
+    /// 是否显示删除账户确认对话框
+    @State private var showDeleteConfirmation = false
+
+    /// 用户输入的确认文本
+    @State private var deleteConfirmationText = ""
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -36,6 +42,12 @@ struct ProfileTabView: View {
                     // 退出登录按钮
                     logoutButton
                         .padding(.horizontal, 20)
+                        .padding(.top, 10)
+
+                    // 删除账户按钮（危险操作）
+                    deleteAccountButton
+                        .padding(.horizontal, 20)
+                        .padding(.top, 20)
                         .padding(.bottom, 40)
 
                     Spacer(minLength: 0)
@@ -318,6 +330,82 @@ struct ProfileTabView: View {
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(ApocalypseTheme.danger.opacity(0.3), lineWidth: 1)
             )
+        }
+    }
+
+    // MARK: - 删除账户按钮
+
+    private var deleteAccountButton: some View {
+        VStack(spacing: 12) {
+            // 警告文本
+            HStack(spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundColor(.orange)
+
+                Text("删除账户后，所有数据将被永久删除且无法恢复")
+                    .font(.caption2)
+                    .foregroundColor(ApocalypseTheme.textMuted)
+            }
+            .padding(.horizontal, 16)
+
+            // 删除账户按钮
+            Button {
+                print("🔵 [UI] 用户点击了删除账户按钮")
+                showDeleteConfirmation = true
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "trash.fill")
+                        .font(.system(size: 16, weight: .semibold))
+
+                    Text("删除账户")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(Color.red.opacity(0.1))
+                .foregroundColor(.red)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.red.opacity(0.3), lineWidth: 1)
+                )
+            }
+        }
+        .alert("删除账户", isPresented: $showDeleteConfirmation) {
+            // 输入框
+            TextField("请输入\"删除\"以确认", text: $deleteConfirmationText)
+                .textInputAutocapitalization(.never)
+
+            // 确认删除按钮
+            Button("确认删除", role: .destructive) {
+                print("🔵 [UI] 用户确认删除账户")
+                print("   用户输入的确认文本: '\(deleteConfirmationText)'")
+
+                if deleteConfirmationText == "删除" {
+                    print("✅ [UI] 确认文本匹配，开始删除账户")
+                    Task {
+                        await authManager.deleteAccount()
+                        // 清空输入框
+                        deleteConfirmationText = ""
+                    }
+                } else {
+                    print("❌ [UI] 确认文本不匹配，取消删除")
+                    print("   期望: '删除'")
+                    print("   实际: '\(deleteConfirmationText)'")
+                    authManager.errorMessage = "输入的文本不正确，请输入\"删除\"来确认"
+                    deleteConfirmationText = ""
+                }
+            }
+            .disabled(deleteConfirmationText != "删除")
+
+            // 取消按钮
+            Button("取消", role: .cancel) {
+                print("🔵 [UI] 用户取消了删除账户")
+                deleteConfirmationText = ""
+            }
+        } message: {
+            Text("⚠️ 此操作不可逆！\n\n删除后，您的所有领地、资源和探索记录都将永久丢失。\n\n请输入\"删除\"来确认此操作。")
         }
     }
 

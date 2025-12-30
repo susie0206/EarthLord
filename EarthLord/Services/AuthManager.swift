@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 import Supabase
+import GoogleSignIn
+import UIKit
 
 /// 认证管理器
 /// 负责处理用户注册、登录、密码重置等认证流程
@@ -339,19 +341,109 @@ class AuthManager: ObservableObject {
         isLoading = false
     }
 
-    /// Sign in with Google（预留）
-    /// TODO: 实现 Google 登录
+    /// Sign in with Google
+    /// 使用 Google OAuth 登录
     func signInWithGoogle() async {
+        print("🔵 [Google登录] 开始 Google 登录流程")
         isLoading = true
-        errorMessage = "Google 登录功能即将推出"
+        errorMessage = nil
 
-        // TODO: 集成 Google Sign-In SDK
-        // 1. 添加 GoogleSignIn 依赖
-        // 2. 配置 OAuth 客户端 ID
-        // 3. 获取 idToken
-        // 4. 调用 supabase.auth.signInWithIdToken(provider: .google, idToken:)
+        do {
+            // 1. 获取根视图控制器
+            print("🔵 [Google登录] 步骤1: 获取根视图控制器")
+            guard let rootViewController = await getRootViewController() else {
+                throw NSError(domain: "AuthManager", code: -1, userInfo: [
+                    NSLocalizedDescriptionKey: "无法获取根视图控制器"
+                ])
+            }
+            print("✅ [Google登录] 根视图控制器获取成功")
+
+            // 2. 配置 Google Sign-In
+            print("🔵 [Google登录] 步骤2: 配置 Google Sign-In")
+            let clientID = "517596145126-v9arshn1as1j6rra58hh81mht8ivmbnd.apps.googleusercontent.com"
+            let config = GIDConfiguration(clientID: clientID)
+            GIDSignIn.sharedInstance.configuration = config
+            print("✅ [Google登录] Google 配置完成，Client ID: \(clientID)")
+
+            // 3. 启动 Google 登录流程
+            print("🔵 [Google登录] 步骤3: 启动 Google 登录界面")
+            let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
+            print("✅ [Google登录] Google 登录界面完成")
+
+            // 4. 获取 ID Token
+            print("🔵 [Google登录] 步骤4: 获取 Google ID Token")
+            guard let idToken = result.user.idToken?.tokenString else {
+                throw NSError(domain: "AuthManager", code: -2, userInfo: [
+                    NSLocalizedDescriptionKey: "无法获取 Google ID Token"
+                ])
+            }
+            print("✅ [Google登录] ID Token 获取成功 (长度: \(idToken.count) 字符)")
+
+            // 5. 使用 ID Token 登录 Supabase
+            print("🔵 [Google登录] 步骤5: 使用 ID Token 登录 Supabase")
+            let session = try await supabase.auth.signInWithIdToken(
+                credentials: .init(
+                    provider: .google,
+                    idToken: idToken
+                )
+            )
+            print("✅ [Google登录] Supabase 登录成功")
+            print("   用户ID: \(session.user.id)")
+            print("   用户邮箱: \(session.user.email ?? "无")")
+
+            // 6. 更新认证状态
+            print("🔵 [Google登录] 步骤6: 更新认证状态")
+            isAuthenticated = true
+            needsPasswordSetup = false
+            print("✅ [Google登录] 认证状态已更新")
+
+            // 7. 获取用户信息
+            print("🔵 [Google登录] 步骤7: 获取用户详细信息")
+            await fetchCurrentUser()
+            print("✅ [Google登录] 用户信息已加载")
+
+            print("🎉 [Google登录] Google 登录流程完成！")
+
+        } catch {
+            print("❌ [Google登录] 登录失败: \(error.localizedDescription)")
+
+            // 区分不同类型的错误
+            if let gidError = error as? GIDSignInError {
+                switch gidError.code {
+                case .canceled:
+                    print("⚠️ [Google登录] 用户取消了登录")
+                    errorMessage = "登录已取消"
+                case .hasNoAuthInKeychain:
+                    print("⚠️ [Google登录] 没有保存的认证信息")
+                    errorMessage = "需要重新登录"
+                default:
+                    print("⚠️ [Google登录] Google 错误代码: \(gidError.code.rawValue)")
+                    errorMessage = "Google 登录失败: \(error.localizedDescription)"
+                }
+            } else {
+                errorMessage = "Google 登录失败: \(error.localizedDescription)"
+            }
+        }
 
         isLoading = false
+    }
+
+    /// 获取根视图控制器
+    /// 用于展示 Google 登录界面
+    private func getRootViewController() async -> UIViewController? {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootViewController = windowScene.windows.first?.rootViewController else {
+            print("❌ [Google登录] 无法找到根视图控制器")
+            return nil
+        }
+
+        // 如果当前有 presented view controller，使用它
+        var topController = rootViewController
+        while let presented = topController.presentedViewController {
+            topController = presented
+        }
+
+        return topController
     }
 
     // MARK: - 登出
@@ -378,6 +470,84 @@ class AuthManager: ObservableObject {
         isLoading = false
     }
 
+    // MARK: - 删除账户
+
+    /// 删除用户账户
+    /// ⚠️ 警告：此操作不可逆！会删除用户的所有数据
+    func deleteAccount() async {
+        print("🔵 [删除账户] 开始删除账户流程")
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            // 1. 确认用户已登录
+            guard isAuthenticated else {
+                print("❌ [删除账户] 用户未登录")
+                throw NSError(domain: "AuthManager", code: -1, userInfo: [
+                    NSLocalizedDescriptionKey: "用户未登录，无法删除账户"
+                ])
+            }
+
+            print("🔵 [删除账户] 步骤1: 获取当前会话")
+            let session = try await supabase.auth.session
+            print("✅ [删除账户] 会话获取成功")
+            print("   用户ID: \(session.user.id)")
+            print("   用户邮箱: \(session.user.email ?? "无")")
+
+            // 2. 调用边缘函数删除账户
+            print("🔵 [删除账户] 步骤2: 调用 delete-account 边缘函数")
+
+            // 定义响应结构
+            struct DeleteAccountResponse: Codable {
+                let success: Bool
+                let message: String
+                let user_id: String
+            }
+
+            // 调用边缘函数
+            let response: DeleteAccountResponse = try await supabase.functions
+                .invoke(
+                    "delete-account",
+                    options: FunctionInvokeOptions(
+                        method: .post,
+                        headers: [
+                            "Authorization": "Bearer \(session.accessToken)"
+                        ]
+                    )
+                )
+
+            print("✅ [删除账户] 边缘函数调用成功")
+            print("   响应消息: \(response.message)")
+            print("   删除的用户ID: \(response.user_id)")
+
+            // 3. 清空本地状态
+            print("🔵 [删除账户] 步骤3: 清空本地状态")
+            isAuthenticated = false
+            needsPasswordSetup = false
+            currentUser = nil
+            otpSent = false
+            otpVerified = false
+            errorMessage = nil
+            print("✅ [删除账户] 本地状态已清空")
+
+            print("🎉 [删除账户] 账户删除流程完成！")
+
+        } catch {
+            print("❌ [删除账户] 删除失败: \(error.localizedDescription)")
+
+            // 详细错误信息
+            if let error = error as NSError? {
+                print("   错误域: \(error.domain)")
+                print("   错误代码: \(error.code)")
+                print("   错误详情: \(error.userInfo)")
+            }
+
+            errorMessage = "删除账户失败: \(error.localizedDescription)"
+        }
+
+        isLoading = false
+    }
+
     // MARK: - 会话管理
 
     /// 检查现有会话
@@ -387,7 +557,7 @@ class AuthManager: ObservableObject {
 
         do {
             // 获取当前会话
-            let session = try await supabase.auth.session
+            _ = try await supabase.auth.session
 
             // 有效会话存在
             isAuthenticated = true
