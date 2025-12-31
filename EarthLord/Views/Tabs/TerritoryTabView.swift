@@ -11,8 +11,8 @@ struct TerritoryTabView: View {
     var body: some View {
         PlaceholderView(
             icon: "flag.fill",
-            title: "领地",
-            subtitle: "管理你的领地"
+            titleKey: "领地",
+            subtitleKey: "管理你的领地"
         )
     }
 }

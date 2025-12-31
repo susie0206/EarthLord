@@ -10,6 +10,12 @@ import SwiftUI
 struct MoreTabView: View {
     /// 认证管理器
     @EnvironmentObject var authManager: AuthManager
+    /// 语言管理器
+    @ObservedObject var languageManager = LanguageManager.shared
+    /// 导航标题
+    @State private var navigationTitle: String = ""
+    /// 当前语言文本
+    @State private var currentLanguageText: String = ""
 
     var body: some View {
         NavigationView {
@@ -25,20 +31,26 @@ struct MoreTabView: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(authManager.currentUser?.username ?? "未知用户")
                                     .font(.headline)
-                                    .foregroundColor(ApocalypseTheme.textPrimary)
+                                    .foregroundColor(.primary)
 
                                 Text(authManager.currentUser?.email ?? "无邮箱")
                                     .font(.caption)
-                                    .foregroundColor(ApocalypseTheme.textSecondary)
+                                    .foregroundColor(.secondary)
 
                                 HStack(spacing: 4) {
                                     Circle()
                                         .fill(authManager.isAuthenticated ? Color.green : Color.gray)
                                         .frame(width: 8, height: 8)
 
-                                    Text(authManager.isAuthenticated ? "已登录" : "未登录")
-                                        .font(.caption2)
-                                        .foregroundColor(ApocalypseTheme.textSecondary)
+                                    if authManager.isAuthenticated {
+                                        LocalizedText("已登录")
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                    } else {
+                                        LocalizedText("未登录")
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                    }
                                 }
                             }
 
@@ -53,7 +65,7 @@ struct MoreTabView: View {
                         } label: {
                             HStack {
                                 Image(systemName: "rectangle.portrait.and.arrow.right")
-                                Text("登出")
+                                LocalizedText("登出")
                                     .fontWeight(.medium)
                             }
                             .frame(maxWidth: .infinity)
@@ -65,7 +77,7 @@ struct MoreTabView: View {
                     }
                     .padding(.vertical, 8)
                 } header: {
-                    Text("账户信息")
+                    LocalizedText("账户信息")
                 }
 
                 Section {
@@ -76,9 +88,9 @@ struct MoreTabView: View {
                                 .frame(width: 30)
 
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Supabase 连接测试")
+                                LocalizedText("Supabase 连接测试")
                                     .font(.body)
-                                Text("测试数据库连接状态")
+                                LocalizedText("测试数据库连接状态")
                                     .font(.caption)
                                     .foregroundColor(.gray)
                             }
@@ -86,22 +98,113 @@ struct MoreTabView: View {
                         .padding(.vertical, 4)
                     }
                 } header: {
-                    Text("开发工具")
+                    LocalizedText("开发工具")
+                }
+
+                // 设置 Section
+                Section {
+                    // 语言设置
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image(systemName: "globe")
+                                .foregroundColor(ApocalypseTheme.primary)
+                                .frame(width: 30)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                LocalizedText("设置")
+                                    .font(.body)
+                                    .foregroundColor(.primary)
+
+                                HStack(spacing: 4) {
+                                    Text(currentLanguageText)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+
+                            Spacer()
+                        }
+
+                        // 语言选择器
+                        ForEach(AppLanguage.allCases) { language in
+                            Button {
+                                print("🌍 [语言切换] 用户选择: \(language.displayName)")
+                                withAnimation {
+                                    languageManager.currentLanguage = language
+                                }
+                            } label: {
+                                HStack {
+                                    Image(systemName: language.icon)
+                                        .foregroundColor(languageManager.currentLanguage == language ? ApocalypseTheme.primary : .secondary)
+                                        .frame(width: 24)
+
+                                    Text(language.displayName)
+                                        .font(.body)
+                                        .foregroundColor(.primary)
+
+                                    Spacer()
+
+                                    if languageManager.currentLanguage == language {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(ApocalypseTheme.primary)
+                                    }
+                                }
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 12)
+                                .background(
+                                    languageManager.currentLanguage == language
+                                        ? ApocalypseTheme.primary.opacity(0.1)
+                                        : Color.clear
+                                )
+                                .cornerRadius(8)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.vertical, 8)
+                } header: {
+                    LocalizedText("设置")
                 }
 
                 Section {
-                    PlaceholderView(
-                        icon: "ellipsis",
-                        title: "更多功能",
-                        subtitle: "即将推出"
-                    )
+                    HStack {
+                        Spacer()
+                        VStack(spacing: 8) {
+                            Image(systemName: "ellipsis")
+                                .font(.system(size: 40))
+                                .foregroundColor(.secondary)
+                            LocalizedText("更多功能")
+                                .font(.headline)
+                            LocalizedText("即将推出")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 40)
+                        Spacer()
+                    }
                     .listRowInsets(EdgeInsets())
                 } header: {
-                    Text("其他功能")
+                    LocalizedText("其他功能")
                 }
             }
-            .navigationTitle("更多")
+            .navigationTitle(navigationTitle)
+            .onAppear {
+                updateAllLocalizedTexts()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .languageDidChange)) { _ in
+                updateAllLocalizedTexts()
+            }
         }
+    }
+
+    private func updateAllLocalizedTexts() {
+        navigationTitle = languageManager.localizedString(forKey: "更多")
+
+        let prefix = languageManager.localizedString(forKey: "当前语言: %@")
+        let languageName = languageManager.currentLanguage.displayName
+        currentLanguageText = prefix.replacingOccurrences(of: "%@", with: languageName)
+
+        print("🌍 [MoreTabView] 更新文本: navigationTitle='\(navigationTitle)', currentLanguageText='\(currentLanguageText)'")
     }
 }
 

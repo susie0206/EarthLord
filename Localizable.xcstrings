@@ -1,0 +1,837 @@
+{
+  "sourceLanguage" : "zh-Hans",
+  "strings" : {
+    "" : {
+
+    },
+    "⚠️ 此操作不可逆！\n\n删除后，您的所有领地、资源和探索记录都将永久丢失。\n\n请输入\"删除\"来确认此操作。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⚠️ This action is irreversible!\n\nAfter deletion, all your territories, resources, and exploration records will be permanently lost.\n\nPlease type \"Delete\" to confirm this action."
+          }
+        }
+      }
+    },
+    "Add Item" : {
+
+    },
+    "EARTH LORD" : {
+
+    },
+    "EarthLord" : {
+
+    },
+    "Item at %@" : {
+
+    },
+    "Select an item" : {
+
+    },
+    "Supabase 连接测试" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supabase Connection Test"
+          }
+        }
+      }
+    },
+    "个人" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profile"
+          }
+        }
+      }
+    },
+    "使用 Apple 登录" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in with Apple"
+          }
+        }
+      }
+    },
+    "使用 Google 登录" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in with Google"
+          }
+        }
+      }
+    },
+    "其他功能" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More Features"
+          }
+        }
+      }
+    },
+    "再次输入密码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Re-enter Password"
+          }
+        }
+      }
+    },
+    "删除账户" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Account"
+          }
+        }
+      }
+    },
+    "删除账户后，所有数据将被永久删除且无法恢复" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After deleting your account, all data will be permanently deleted and cannot be recovered"
+          }
+        }
+      }
+    },
+    "加入时间：%@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Joined: %@"
+          }
+        }
+      }
+    },
+    "即将推出" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coming Soon"
+          }
+        }
+      }
+    },
+    "发送验证码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Code"
+          }
+        }
+      }
+    },
+    "取消" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "在线" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Online"
+          }
+        }
+      }
+    },
+    "地图" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Map"
+          }
+        }
+      }
+    },
+    "地球新主" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Earth Lord"
+          }
+        }
+      }
+    },
+    "完成注册" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete Registration"
+          }
+        }
+      }
+    },
+    "密码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password"
+          }
+        }
+      }
+    },
+    "已登录" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logged In"
+          }
+        }
+      }
+    },
+    "帮助与反馈" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Help & Feedback"
+          }
+        }
+      }
+    },
+    "幸存者数据" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Survivor Data"
+          }
+        }
+      }
+    },
+    "幸存者档案" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Survivor Profile"
+          }
+        }
+      }
+    },
+    "开发工具" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dev Tools"
+          }
+        }
+      }
+    },
+    "当前语言: %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current Language: %@"
+          }
+        }
+      }
+    },
+    "忘记密码？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forgot Password?"
+          }
+        }
+      }
+    },
+    "忘记密码页面" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forgot Password"
+          }
+        }
+      }
+    },
+    "或者使用以下方式登录" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Or sign in with"
+          }
+        }
+      }
+    },
+    "找回密码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recover Password"
+          }
+        }
+      }
+    },
+    "探索和圈占领地" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explore & Claim Territory"
+          }
+        }
+      }
+    },
+    "探索点" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "POIs"
+          }
+        }
+      }
+    },
+    "提示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip"
+          }
+        }
+      }
+    },
+    "新密码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Password"
+          }
+        }
+      }
+    },
+    "无邮箱" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Email"
+          }
+        }
+      }
+    },
+    "更多" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More"
+          }
+        }
+      }
+    },
+    "更多功能" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More Features"
+          }
+        }
+      }
+    },
+    "未登录" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Logged In"
+          }
+        }
+      }
+    },
+    "未知幸存者" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown Survivor"
+          }
+        }
+      }
+    },
+    "注册" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up"
+          }
+        }
+      }
+    },
+    "注册页面" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up"
+          }
+        }
+      }
+    },
+    "测试中..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Testing..."
+          }
+        }
+      }
+    },
+    "测试数据库连接状态" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test Database Connection"
+          }
+        }
+      }
+    },
+    "测试连接" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test Connection"
+          }
+        }
+      }
+    },
+    "登出" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Out"
+          }
+        }
+      }
+    },
+    "登录" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign In"
+          }
+        }
+      }
+    },
+    "确定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm"
+          }
+        }
+      }
+    },
+    "确认删除" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm Delete"
+          }
+        }
+      }
+    },
+    "确认密码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm Password"
+          }
+        }
+      }
+    },
+    "离线" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline"
+          }
+        }
+      }
+    },
+    "管理你的领地" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Your Territory"
+          }
+        }
+      }
+    },
+    "编辑资料" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Profile"
+          }
+        }
+      }
+    },
+    "至少 8 位，包含字母和数字" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At least 8 characters with letters and numbers"
+          }
+        }
+      }
+    },
+    "至少 8 位字符" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At least 8 characters"
+          }
+        }
+      }
+    },
+    "设置" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        }
+      }
+    },
+    "设置密码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set Password"
+          }
+        }
+      }
+    },
+    "请输入 6 位验证码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter 6-digit code"
+          }
+        }
+      }
+    },
+    "请输入\"删除\"以确认" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type \"Delete\" to confirm"
+          }
+        }
+      }
+    },
+    "请输入密码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter password"
+          }
+        }
+      }
+    },
+    "请输入注册邮箱" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter registration email"
+          }
+        }
+      }
+    },
+    "请输入邮箱" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter email"
+          }
+        }
+      }
+    },
+    "账户信息" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account Information"
+          }
+        }
+      }
+    },
+    "资源" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resources"
+          }
+        }
+      }
+    },
+    "输入的文本不正确，请输入\"删除\"来确认" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incorrect text. Please type \"Delete\" to confirm"
+          }
+        }
+      }
+    },
+    "还没有账号？立即注册" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Don't have an account? Sign up"
+          }
+        }
+      }
+    },
+    "这里是分支宇宙的测试页" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parallel Universe Test Page"
+          }
+        }
+      }
+    },
+    "进入测试页" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter Test Page"
+          }
+        }
+      }
+    },
+    "退出登录" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Out"
+          }
+        }
+      }
+    },
+    "通知设置" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
+          }
+        }
+      }
+    },
+    "邮箱" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email"
+          }
+        }
+      }
+    },
+    "重新发送 (%llds)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resend (%llds)"
+          }
+        }
+      }
+    },
+    "重新发送验证码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resend Code"
+          }
+        }
+      }
+    },
+    "重置密码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Password"
+          }
+        }
+      }
+    },
+    "隐私设置" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy"
+          }
+        }
+      }
+    },
+    "领地" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Territory"
+          }
+        }
+      }
+    },
+    "验证" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verify"
+          }
+        }
+      }
+    },
+    "验证成功！请设置您的密码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verification successful! Set your password"
+          }
+        }
+      }
+    },
+    "验证成功！请设置新密码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verification successful! Set a new password"
+          }
+        }
+      }
+    },
+    "验证码" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verification Code"
+          }
+        }
+      }
+    },
+    "验证码已发送至 %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code sent to %@"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

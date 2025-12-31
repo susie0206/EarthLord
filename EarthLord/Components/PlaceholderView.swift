@@ -10,8 +10,8 @@ import SwiftUI
 /// 通用占位视图
 struct PlaceholderView: View {
     let icon: String
-    let title: LocalizedStringKey
-    let subtitle: LocalizedStringKey
+    let titleKey: String
+    let subtitleKey: String
 
     var body: some View {
         ZStack {
@@ -23,12 +23,12 @@ struct PlaceholderView: View {
                     .font(.system(size: 60))
                     .foregroundColor(ApocalypseTheme.primary)
 
-                Text(title)
+                LocalizedText(titleKey)
                     .font(.title2)
                     .fontWeight(.semibold)
                     .foregroundColor(ApocalypseTheme.textPrimary)
 
-                Text(subtitle)
+                LocalizedText(subtitleKey)
                     .font(.subheadline)
                     .foregroundColor(ApocalypseTheme.textSecondary)
             }
@@ -39,7 +39,7 @@ struct PlaceholderView: View {
 #Preview {
     PlaceholderView(
         icon: "map.fill",
-        title: "地图",
-        subtitle: "探索和圈占领地"
+        titleKey: "地图",
+        subtitleKey: "探索和圈占领地"
     )
 }

@@ -9,38 +9,58 @@ import SwiftUI
 
 struct MainTabView: View {
     @State private var selectedTab = 0
+    @ObservedObject var languageManager = LanguageManager.shared
+
+    // Tab labels
+    @State private var mapTabLabel: String = ""
+    @State private var territoryTabLabel: String = ""
+    @State private var profileTabLabel: String = ""
+    @State private var moreTabLabel: String = ""
 
     var body: some View {
         TabView(selection: $selectedTab) {
             MapTabView()
                 .tabItem {
                     Image(systemName: "map.fill")
-                    Text("地图")
+                    Text(mapTabLabel)
                 }
                 .tag(0)
 
             TerritoryTabView()
                 .tabItem {
                     Image(systemName: "flag.fill")
-                    Text("领地")
+                    Text(territoryTabLabel)
                 }
                 .tag(1)
 
             ProfileTabView()
                 .tabItem {
                     Image(systemName: "person.fill")
-                    Text("个人")
+                    Text(profileTabLabel)
                 }
                 .tag(2)
 
             MoreTabView()
                 .tabItem {
                     Image(systemName: "ellipsis")
-                    Text("更多")
+                    Text(moreTabLabel)
                 }
                 .tag(3)
         }
         .tint(ApocalypseTheme.primary)
+        .onAppear {
+            updateTabLabels()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .languageDidChange)) { _ in
+            updateTabLabels()
+        }
+    }
+
+    private func updateTabLabels() {
+        mapTabLabel = languageManager.localizedString(forKey: "地图")
+        territoryTabLabel = languageManager.localizedString(forKey: "领地")
+        profileTabLabel = languageManager.localizedString(forKey: "个人")
+        moreTabLabel = languageManager.localizedString(forKey: "更多")
     }
 }
 

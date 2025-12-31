@@ -582,13 +582,16 @@ class AuthManager: ObservableObject {
             let authUser = try await supabase.auth.session.user
 
             // 从 profiles 表查询用户资料
-            let profile: User = try await supabase
+            var profile: User = try await supabase
                 .from("profiles")
                 .select()
                 .eq("id", value: authUser.id.uuidString)
                 .single()
                 .execute()
                 .value
+
+            // 补充邮箱信息（profiles 表中没有 email 字段，需要从 authUser 获取）
+            profile.email = authUser.email
 
             currentUser = profile
 

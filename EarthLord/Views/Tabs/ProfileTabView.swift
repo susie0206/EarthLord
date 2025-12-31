@@ -10,12 +10,16 @@ import SwiftUI
 struct ProfileTabView: View {
     /// 认证管理器
     @EnvironmentObject var authManager: AuthManager
+    /// 语言管理器
+    @ObservedObject var languageManager = LanguageManager.shared
 
     /// 是否显示删除账户确认对话框
     @State private var showDeleteConfirmation = false
 
     /// 用户输入的确认文本
     @State private var deleteConfirmationText = ""
+    /// 导航标题
+    @State private var navigationTitle: String = ""
 
     var body: some View {
         NavigationView {
@@ -28,6 +32,7 @@ struct ProfileTabView: View {
                     userInfoCard
                         .padding(.horizontal, 20)
                         .offset(y: -60)
+                        .id(languageManager.currentLanguage)
 
                     // 统计信息
                     statisticsSection
@@ -57,12 +62,22 @@ struct ProfileTabView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("幸存者档案")
+                    Text(navigationTitle)
                         .font(.headline)
                         .foregroundColor(ApocalypseTheme.textPrimary)
                 }
             }
+            .onAppear {
+                updateLocalizedTexts()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .languageDidChange)) { _ in
+                updateLocalizedTexts()
+            }
         }
+    }
+
+    private func updateLocalizedTexts() {
+        navigationTitle = languageManager.localizedString(forKey: "幸存者档案")
     }
 
     // MARK: - 头部背景
@@ -127,19 +142,31 @@ struct ProfileTabView: View {
             }
 
             // 用户名
-            Text(authManager.currentUser?.username ?? "未知幸存者")
+            Text(authManager.currentUser?.username ?? languageManager.localizedString(forKey: "未知幸存者"))
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(ApocalypseTheme.textPrimary)
 
             // 邮箱
-            HStack(spacing: 6) {
-                Image(systemName: "envelope.fill")
-                    .font(.caption)
-                    .foregroundColor(ApocalypseTheme.textSecondary)
+            if let email = authManager.currentUser?.email, !email.isEmpty {
+                HStack(spacing: 6) {
+                    Image(systemName: "envelope.fill")
+                        .font(.caption)
+                        .foregroundColor(ApocalypseTheme.textSecondary)
 
-                Text(authManager.currentUser?.email ?? "无邮箱")
-                    .font(.subheadline)
-                    .foregroundColor(ApocalypseTheme.textSecondary)
+                    Text(email)
+                        .font(.subheadline)
+                        .foregroundColor(ApocalypseTheme.textSecondary)
+                }
+            } else {
+                HStack(spacing: 6) {
+                    Image(systemName: "envelope.fill")
+                        .font(.caption)
+                        .foregroundColor(ApocalypseTheme.textSecondary)
+
+                    LocalizedText("无邮箱")
+                        .font(.subheadline)
+                        .foregroundColor(ApocalypseTheme.textSecondary)
+                }
             }
 
             // 登录状态
@@ -148,16 +175,24 @@ struct ProfileTabView: View {
                     .fill(authManager.isAuthenticated ? ApocalypseTheme.success : ApocalypseTheme.textMuted)
                     .frame(width: 8, height: 8)
 
-                Text(authManager.isAuthenticated ? "在线" : "离线")
-                    .font(.caption)
-                    .foregroundColor(ApocalypseTheme.textSecondary)
+                if authManager.isAuthenticated {
+                    LocalizedText("在线")
+                        .font(.caption)
+                        .foregroundColor(ApocalypseTheme.textSecondary)
+                } else {
+                    LocalizedText("离线")
+                        .font(.caption)
+                        .foregroundColor(ApocalypseTheme.textSecondary)
+                }
             }
 
             // 注册时间
             if let createdAt = authManager.currentUser?.createdAt {
-                Text("加入时间：\(formatDate(createdAt))")
-                    .font(.caption2)
-                    .foregroundColor(ApocalypseTheme.textMuted)
+                HStack(spacing: 0) {
+                    LocalizedText("加入时间：%@", formatDate(createdAt))
+                        .font(.caption2)
+                        .foregroundColor(ApocalypseTheme.textSecondary)
+                }
             }
         }
         .padding(.vertical, 24)
@@ -178,7 +213,7 @@ struct ProfileTabView: View {
 
     private var statisticsSection: some View {
         VStack(spacing: 16) {
-            Text("幸存者数据")
+            LocalizedText("幸存者数据")
                 .font(.headline)
                 .foregroundColor(ApocalypseTheme.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -186,21 +221,21 @@ struct ProfileTabView: View {
             HStack(spacing: 12) {
                 statisticCard(
                     icon: "map.fill",
-                    title: "领地",
+                    titleKey: "领地",
                     value: "0",
                     color: ApocalypseTheme.primary
                 )
 
                 statisticCard(
                     icon: "location.fill",
-                    title: "探索点",
+                    titleKey: "探索点",
                     value: "0",
                     color: .blue
                 )
 
                 statisticCard(
                     icon: "cube.box.fill",
-                    title: "资源",
+                    titleKey: "资源",
                     value: "0",
                     color: .green
                 )
@@ -209,7 +244,7 @@ struct ProfileTabView: View {
     }
 
     // 统计卡片
-    private func statisticCard(icon: String, title: String, value: String, color: Color) -> some View {
+    private func statisticCard(icon: String, titleKey: String, value: String, color: Color) -> some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.system(size: 24))
@@ -219,7 +254,7 @@ struct ProfileTabView: View {
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(ApocalypseTheme.textPrimary)
 
-            Text(title)
+            LocalizedText(titleKey)
                 .font(.caption)
                 .foregroundColor(ApocalypseTheme.textSecondary)
         }
@@ -233,7 +268,7 @@ struct ProfileTabView: View {
 
     private var functionsSection: some View {
         VStack(spacing: 12) {
-            Text("设置")
+            LocalizedText("设置")
                 .font(.headline)
                 .foregroundColor(ApocalypseTheme.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -241,7 +276,7 @@ struct ProfileTabView: View {
             VStack(spacing: 0) {
                 functionRow(
                     icon: "person.fill",
-                    title: "编辑资料",
+                    titleKey: "编辑资料",
                     iconColor: .blue
                 )
 
@@ -251,7 +286,7 @@ struct ProfileTabView: View {
 
                 functionRow(
                     icon: "bell.fill",
-                    title: "通知设置",
+                    titleKey: "通知设置",
                     iconColor: .orange
                 )
 
@@ -261,7 +296,7 @@ struct ProfileTabView: View {
 
                 functionRow(
                     icon: "shield.fill",
-                    title: "隐私设置",
+                    titleKey: "隐私设置",
                     iconColor: .green
                 )
 
@@ -271,7 +306,7 @@ struct ProfileTabView: View {
 
                 functionRow(
                     icon: "questionmark.circle.fill",
-                    title: "帮助与反馈",
+                    titleKey: "帮助与反馈",
                     iconColor: .purple
                 )
             }
@@ -281,7 +316,7 @@ struct ProfileTabView: View {
     }
 
     // 功能行
-    private func functionRow(icon: String, title: String, iconColor: Color) -> some View {
+    private func functionRow(icon: String, titleKey: String, iconColor: Color) -> some View {
         Button {
             // TODO: 实现对应功能
         } label: {
@@ -291,7 +326,7 @@ struct ProfileTabView: View {
                     .foregroundColor(iconColor)
                     .frame(width: 32)
 
-                Text(title)
+                LocalizedText(titleKey)
                     .font(.body)
                     .foregroundColor(ApocalypseTheme.textPrimary)
 
@@ -318,7 +353,7 @@ struct ProfileTabView: View {
                 Image(systemName: "rectangle.portrait.and.arrow.right")
                     .font(.system(size: 16, weight: .semibold))
 
-                Text("退出登录")
+                LocalizedText("退出登录")
                     .font(.system(size: 16, weight: .semibold))
             }
             .frame(maxWidth: .infinity)
@@ -343,9 +378,9 @@ struct ProfileTabView: View {
                     .font(.caption)
                     .foregroundColor(.orange)
 
-                Text("删除账户后，所有数据将被永久删除且无法恢复")
+                LocalizedText("删除账户后，所有数据将被永久删除且无法恢复")
                     .font(.caption2)
-                    .foregroundColor(ApocalypseTheme.textMuted)
+                    .foregroundColor(ApocalypseTheme.textSecondary)
             }
             .padding(.horizontal, 16)
 
@@ -358,7 +393,7 @@ struct ProfileTabView: View {
                     Image(systemName: "trash.fill")
                         .font(.system(size: 16, weight: .semibold))
 
-                    Text("删除账户")
+                    LocalizedText("删除账户")
                         .font(.system(size: 16, weight: .semibold))
                 }
                 .frame(maxWidth: .infinity)
@@ -372,13 +407,13 @@ struct ProfileTabView: View {
                 )
             }
         }
-        .alert("删除账户", isPresented: $showDeleteConfirmation) {
+        .alert(LocalizedStringKey("删除账户"), isPresented: $showDeleteConfirmation) {
             // 输入框
-            TextField("请输入\"删除\"以确认", text: $deleteConfirmationText)
+            TextField(LocalizedStringKey("请输入\"删除\"以确认"), text: $deleteConfirmationText)
                 .textInputAutocapitalization(.never)
 
             // 确认删除按钮
-            Button("确认删除", role: .destructive) {
+            Button(LocalizedStringKey("确认删除"), role: .destructive) {
                 print("🔵 [UI] 用户确认删除账户")
                 print("   用户输入的确认文本: '\(deleteConfirmationText)'")
 
@@ -400,12 +435,12 @@ struct ProfileTabView: View {
             .disabled(deleteConfirmationText != "删除")
 
             // 取消按钮
-            Button("取消", role: .cancel) {
+            Button(LocalizedStringKey("取消"), role: .cancel) {
                 print("🔵 [UI] 用户取消了删除账户")
                 deleteConfirmationText = ""
             }
         } message: {
-            Text("⚠️ 此操作不可逆！\n\n删除后，您的所有领地、资源和探索记录都将永久丢失。\n\n请输入\"删除\"来确认此操作。")
+            Text(LocalizedStringKey("⚠️ 此操作不可逆！\n\n删除后，您的所有领地、资源和探索记录都将永久丢失。\n\n请输入\"删除\"来确认此操作。"))
         }
     }
 
@@ -414,8 +449,17 @@ struct ProfileTabView: View {
     /// 格式化日期
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy年MM月dd日"
-        formatter.locale = Locale(identifier: "zh_CN")
+
+        // 根据当前语言选择日期格式
+        let languageCode = languageManager.effectiveLanguageCode
+        if languageCode == "zh-Hans" {
+            formatter.dateFormat = "yyyy年MM月dd日"
+            formatter.locale = Locale(identifier: "zh_CN")
+        } else {
+            formatter.dateFormat = "MMM d, yyyy"
+            formatter.locale = Locale(identifier: "en_US")
+        }
+
         return formatter.string(from: date)
     }
 }

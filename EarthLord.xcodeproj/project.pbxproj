@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A86E5FBB2EFEBBF400592EC9 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = A86E5FBA2EFEBBF400592EC9 /* Supabase */; };
+		A878FCAA2F054FDB00EC8372 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A878FCA92F054FDB00EC8372 /* Localizable.xcstrings */; };
 		A8B9BD822F040A2800FBBCD8 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A8B9BD812F040A2800FBBCD8 /* GoogleSignIn */; };
 		A8B9BD842F040A2800FBBCD8 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A8B9BD832F040A2800FBBCD8 /* GoogleSignInSwift */; };
 /* End PBXBuildFile section */
@@ -30,6 +31,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A878FCA92F054FDB00EC8372 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		A8B10AAC2EFACC7A00E13C4C /* EarthLord.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EarthLord.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8B10ABB2EFACC7B00E13C4C /* EarthLordTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EarthLordTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8B10AC52EFACC7B00E13C4C /* EarthLordUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EarthLordUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -97,6 +99,7 @@
 		A8B10AA32EFACC7A00E13C4C = {
 			isa = PBXGroup;
 			children = (
+				A878FCA92F054FDB00EC8372 /* Localizable.xcstrings */,
 				A8B10AAE2EFACC7A00E13C4C /* EarthLord */,
 				A8B10ABE2EFACC7B00E13C4C /* EarthLordTests */,
 				A8B10AC82EFACC7B00E13C4C /* EarthLordUITests */,
@@ -212,11 +215,12 @@
 				};
 			};
 			buildConfigurationList = A8B10AA72EFACC7A00E13C4C /* Build configuration list for PBXProject "EarthLord" */;
-			developmentRegion = en;
+			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = A8B10AA32EFACC7A00E13C4C;
 			minimizedProjectReferenceProxies = 1;
@@ -241,6 +245,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A878FCAA2F054FDB00EC8372 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -358,6 +363,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -415,6 +421,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
