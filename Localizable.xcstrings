@@ -4,6 +4,17 @@
     "" : {
 
     },
+    "《地球新主》需要获取您的位置来显示您在末日世界中的坐标，帮助您探索和圈定领地。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Earth Lord needs access to your location to display your coordinates in the post-apocalyptic world and help you explore and claim territories."
+          }
+        }
+      }
+    },
     "⚠️ 此操作不可逆！\n\n删除后，您的所有领地、资源和探索记录都将永久丢失。\n\n请输入\"删除\"来确认此操作。" : {
       "localizations" : {
         "en" : {
@@ -108,6 +119,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "After deleting your account, all data will be permanently deleted and cannot be recovered"
+          }
+        }
+      }
+    },
+    "前往设置" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go to Settings"
           }
         }
       }
@@ -268,6 +290,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Current Language: %@"
+          }
+        }
+      }
+    },
+    "当前坐标" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current Location"
+          }
+        }
+      }
+    },
+    "获取中..." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Locating..."
           }
         }
       }
@@ -767,6 +811,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Privacy"
+          }
+        }
+      }
+    },
+    "需要定位权限" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location Permission Required"
           }
         }
       }
