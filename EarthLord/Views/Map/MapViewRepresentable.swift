@@ -3,7 +3,7 @@
 //  EarthLord
 //
 //  MKMapView 的 SwiftUI 包装器
-//  负责显示地图、应用末世滤镜、处理用户位置更新和自动居中
+//  负责显示地图、应用末世滤镜、处理用户位置更新、自动居中、轨迹渲染
 //
 
 import SwiftUI
@@ -19,6 +19,15 @@ struct MapViewRepresentable: UIViewRepresentable {
 
     /// 重新居中触发器（计数器，每次点击按钮时递增）
     @Binding var recenterTrigger: Int
+
+    /// 追踪路径坐标数组
+    @Binding var trackingPath: [CLLocationCoordinate2D]
+
+    /// 路径更新版本号（触发轨迹重新渲染）
+    var pathUpdateVersion: Int
+
+    /// 是否正在追踪
+    var isTracking: Bool
 
     // MARK: - UIViewRepresentable
 
@@ -47,7 +56,7 @@ struct MapViewRepresentable: UIViewRepresentable {
         return mapView
     }
 
-    /// 更新地图视图（处理重新居中）
+    /// 更新地图视图（处理重新居中和轨迹更新）
     func updateUIView(_ mapView: MKMapView, context: Context) {
         // 检测重新居中触发器的变化
         if context.coordinator.lastRecenterTrigger != recenterTrigger {
@@ -65,6 +74,12 @@ struct MapViewRepresentable: UIViewRepresentable {
 
                 mapView.setRegion(region, animated: true)
             }
+        }
+
+        // 检测路径更新版本号的变化
+        if context.coordinator.lastPathUpdateVersion != pathUpdateVersion {
+            context.coordinator.lastPathUpdateVersion = pathUpdateVersion
+            updateTrackingPath(on: mapView)
         }
     }
 
@@ -91,6 +106,32 @@ struct MapViewRepresentable: UIViewRepresentable {
         print("🎨 [MapView] 已应用末世滤镜（轻量版）")
     }
 
+    // MARK: - Path Tracking
+
+    /// 更新追踪路径显示
+    private func updateTrackingPath(on mapView: MKMapView) {
+        // 移除所有旧的轨迹线
+        let oldOverlays = mapView.overlays.filter { $0 is MKPolyline }
+        mapView.removeOverlays(oldOverlays)
+
+        // 如果路径点数少于 2 个，不绘制
+        guard trackingPath.count >= 2 else {
+            print("📍 [MapView] 路径点数不足 2 个，跳过绘制")
+            return
+        }
+
+        // ⚠️ 关键：坐标转换（WGS-84 → GCJ-02）
+        let gcj02Coordinates = CoordinateConverter.convertCoordinates(trackingPath)
+
+        // 创建轨迹线
+        let polyline = MKPolyline(coordinates: gcj02Coordinates, count: gcj02Coordinates.count)
+
+        // 添加到地图
+        mapView.addOverlay(polyline)
+
+        print("🎨 [MapView] 绘制轨迹线，点数: \(trackingPath.count)")
+    }
+
     // MARK: - Coordinator
 
     /// 地图视图协调器（处理 MKMapViewDelegate 回调）
@@ -103,6 +144,9 @@ struct MapViewRepresentable: UIViewRepresentable {
 
         /// 上次的重新居中触发器值
         var lastRecenterTrigger: Int = 0
+
+        /// 上次的路径更新版本号
+        var lastPathUpdateVersion: Int = 0
 
         init(_ parent: MapViewRepresentable) {
             self.parent = parent
@@ -146,6 +190,19 @@ struct MapViewRepresentable: UIViewRepresentable {
 
             // 标记已完成首次居中
             hasInitialCentered = true
+        }
+
+        /// ⚠️ 关键方法：渲染轨迹线
+        /// 如果不实现这个方法，轨迹添加了也看不见！
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            if let polyline = overlay as? MKPolyline {
+                let renderer = MKPolylineRenderer(polyline: polyline)
+                renderer.strokeColor = UIColor.cyan  // 青色轨迹
+                renderer.lineWidth = 5  // 线宽 5pt
+                renderer.lineCap = .round  // 圆头线条
+                return renderer
+            }
+            return MKOverlayRenderer(overlay: overlay)
         }
 
         /// 地图区域改变完成后调用

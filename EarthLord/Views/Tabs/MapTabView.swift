@@ -3,7 +3,7 @@
 //  EarthLord
 //
 //  地图页面
-//  显示真实地图、用户位置、定位权限请求
+//  显示真实地图、用户位置、定位权限请求、路径追踪
 //
 
 import SwiftUI
@@ -34,7 +34,10 @@ struct MapTabView: View {
             // 地图视图
             MapViewRepresentable(
                 userLocation: $userLocation,
-                recenterTrigger: $recenterTrigger
+                recenterTrigger: $recenterTrigger,
+                trackingPath: $locationManager.pathCoordinates,
+                pathUpdateVersion: locationManager.pathUpdateVersion,
+                isTracking: locationManager.isTracking
             )
             .ignoresSafeArea()
 
@@ -54,14 +57,20 @@ struct MapTabView: View {
                 Spacer()
             }
 
-            // 右下角叠加层：定位按钮
+            // 右下角叠加层：按钮组（圈地按钮 + 定位按钮）
             VStack {
                 Spacer()
                 HStack {
                     Spacer()
-                    locationButton
-                        .padding(.trailing, 20)
-                        .padding(.bottom, 20)
+                    VStack(spacing: 12) {
+                        // 圈地按钮
+                        territoryButton
+
+                        // 定位按钮
+                        locationButton
+                    }
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 20)
                 }
             }
         }
@@ -161,9 +170,52 @@ struct MapTabView: View {
         )
     }
 
+    // MARK: - Territory Button
+
+    /// 圈地按钮（胶囊型）
+    private var territoryButton: some View {
+        Button {
+            toggleTracking()
+        } label: {
+            HStack(spacing: 8) {
+                // 图标
+                Image(systemName: locationManager.isTracking ? "stop.fill" : "flag.fill")
+                    .font(.system(size: 16))
+
+                // 文字
+                if locationManager.isTracking {
+                    LocalizedText("停止圈地")
+                        .font(.system(size: 14, weight: .semibold))
+
+                    // 点数标记
+                    if locationManager.pathCoordinates.count > 0 {
+                        Text("\(locationManager.pathCoordinates.count)")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.red.opacity(0.3))
+                            .cornerRadius(8)
+                    }
+                } else {
+                    LocalizedText("开始圈地")
+                        .font(.system(size: 14, weight: .semibold))
+                }
+            }
+            .foregroundColor(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(
+                Capsule()
+                    .fill(locationManager.isTracking ? Color.red : ApocalypseTheme.primary)
+            )
+            .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 2)
+        }
+    }
+
     // MARK: - Location Button
 
-    /// 右下角的定位按钮（回到当前位置）
+    /// 定位按钮（回到当前位置）
     private var locationButton: some View {
         Button {
             recenterMap()
@@ -200,6 +252,20 @@ struct MapTabView: View {
 
         @unknown default:
             break
+        }
+    }
+
+    /// 切换追踪状态
+    private func toggleTracking() {
+        if locationManager.isTracking {
+            // 停止追踪
+            print("🛑 [MapTabView] 用户点击停止圈地")
+            locationManager.stopPathTracking()
+        } else {
+            // 开始追踪
+            print("🚩 [MapTabView] 用户点击开始圈地")
+            locationManager.clearPath()  // 清除旧路径
+            locationManager.startPathTracking()
         }
     }
 

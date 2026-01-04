@@ -15,6 +15,9 @@
         }
       }
     },
+    "%lld" : {
+
+    },
     "⚠️ 此操作不可逆！\n\n删除后，您的所有领地、资源和探索记录都将永久丢失。\n\n请输入\"删除\"来确认此操作。" : {
       "localizations" : {
         "en" : {
@@ -77,6 +80,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sign in with Google"
+          }
+        }
+      }
+    },
+    "停止圈地" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop Claiming"
           }
         }
       }
@@ -283,13 +297,13 @@
         }
       }
     },
-    "当前语言: %@" : {
+    "开始圈地" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Current Language: %@"
+            "value" : "Start Claiming"
           }
         }
       }
@@ -305,13 +319,13 @@
         }
       }
     },
-    "获取中..." : {
+    "当前语言: %@" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Locating..."
+            "value" : "Current Language: %@"
           }
         }
       }
@@ -604,6 +618,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "At least 8 characters"
+          }
+        }
+      }
+    },
+    "获取中..." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Locating..."
           }
         }
       }
