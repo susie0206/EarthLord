@@ -37,13 +37,19 @@ struct MapTabView: View {
                 recenterTrigger: $recenterTrigger,
                 trackingPath: $locationManager.pathCoordinates,
                 pathUpdateVersion: locationManager.pathUpdateVersion,
-                isTracking: locationManager.isTracking
+                isTracking: locationManager.isTracking,
+                isPathClosed: locationManager.isPathClosed
             )
             .ignoresSafeArea()
 
             // 顶部叠加层：权限被拒绝提示
             if locationManager.isDenied {
                 permissionDeniedOverlay
+            }
+
+            // 顶部叠加层：速度警告横幅
+            if locationManager.speedWarning != nil {
+                speedWarningBanner
             }
 
             // 左上角叠加层：当前坐标显示
@@ -80,6 +86,51 @@ struct MapTabView: View {
         .onChange(of: locationManager.authorizationStatus) { oldValue, newValue in
             handleLocationPermission()
         }
+        .onChange(of: locationManager.speedWarning) { oldValue, newValue in
+            // 当速度警告出现时，3 秒后自动消失
+            if newValue != nil {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                    locationManager.speedWarning = nil
+                }
+            }
+        }
+    }
+
+    // MARK: - Speed Warning Banner
+
+    /// 速度警告横幅
+    private var speedWarningBanner: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                // 警告图标
+                Image(systemName: locationManager.isTracking ? "exclamationmark.triangle.fill" : "xmark.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(.white)
+
+                // 警告文字
+                if let warning = locationManager.speedWarning {
+                    Text(warning)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.white)
+                }
+
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(
+                // 根据是否还在追踪选择背景色
+                locationManager.isTracking ? Color.orange : Color.red
+            )
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 2)
+            .padding(.horizontal, 20)
+            .padding(.top, 60)
+
+            Spacer()
+        }
+        .transition(.move(edge: .top).combined(with: .opacity))
+        .animation(.easeInOut, value: locationManager.speedWarning)
     }
 
     // MARK: - Permission Denied Overlay

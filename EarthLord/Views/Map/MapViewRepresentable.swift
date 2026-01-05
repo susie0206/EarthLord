@@ -29,6 +29,9 @@ struct MapViewRepresentable: UIViewRepresentable {
     /// 是否正在追踪
     var isTracking: Bool
 
+    /// 路径是否已闭合
+    var isPathClosed: Bool
+
     // MARK: - UIViewRepresentable
 
     /// 创建 MKMapView
@@ -81,6 +84,9 @@ struct MapViewRepresentable: UIViewRepresentable {
             context.coordinator.lastPathUpdateVersion = pathUpdateVersion
             updateTrackingPath(on: mapView)
         }
+
+        // 更新 Coordinator 的 isPathClosed 状态（用于渲染颜色）
+        context.coordinator.isPathClosed = isPathClosed
     }
 
     /// 创建 Coordinator（处理地图回调）
@@ -110,8 +116,8 @@ struct MapViewRepresentable: UIViewRepresentable {
 
     /// 更新追踪路径显示
     private func updateTrackingPath(on mapView: MKMapView) {
-        // 移除所有旧的轨迹线
-        let oldOverlays = mapView.overlays.filter { $0 is MKPolyline }
+        // 移除所有旧的覆盖物（轨迹线 + 多边形）
+        let oldOverlays = mapView.overlays
         mapView.removeOverlays(oldOverlays)
 
         // 如果路径点数少于 2 个，不绘制
@@ -125,11 +131,16 @@ struct MapViewRepresentable: UIViewRepresentable {
 
         // 创建轨迹线
         let polyline = MKPolyline(coordinates: gcj02Coordinates, count: gcj02Coordinates.count)
-
-        // 添加到地图
         mapView.addOverlay(polyline)
 
-        print("🎨 [MapView] 绘制轨迹线，点数: \(trackingPath.count)")
+        // 如果路径已闭合且点数 ≥ 3，绘制多边形填充
+        if isPathClosed && trackingPath.count >= 3 {
+            let polygon = MKPolygon(coordinates: gcj02Coordinates, count: gcj02Coordinates.count)
+            mapView.addOverlay(polygon)
+            print("🎨 [MapView] 绘制闭环多边形，点数: \(trackingPath.count)")
+        } else {
+            print("🎨 [MapView] 绘制轨迹线，点数: \(trackingPath.count)")
+        }
     }
 
     // MARK: - Coordinator
@@ -147,6 +158,9 @@ struct MapViewRepresentable: UIViewRepresentable {
 
         /// 上次的路径更新版本号
         var lastPathUpdateVersion: Int = 0
+
+        /// 路径是否已闭合（用于渲染颜色）
+        var isPathClosed: Bool = false
 
         init(_ parent: MapViewRepresentable) {
             self.parent = parent
@@ -192,16 +206,28 @@ struct MapViewRepresentable: UIViewRepresentable {
             hasInitialCentered = true
         }
 
-        /// ⚠️ 关键方法：渲染轨迹线
+        /// ⚠️ 关键方法：渲染轨迹线和多边形
         /// 如果不实现这个方法，轨迹添加了也看不见！
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            // 渲染轨迹线
             if let polyline = overlay as? MKPolyline {
                 let renderer = MKPolylineRenderer(polyline: polyline)
-                renderer.strokeColor = UIColor.cyan  // 青色轨迹
+                // ⚠️ 根据是否闭环改变颜色
+                renderer.strokeColor = isPathClosed ? UIColor.systemGreen : UIColor.cyan
                 renderer.lineWidth = 5  // 线宽 5pt
                 renderer.lineCap = .round  // 圆头线条
                 return renderer
             }
+
+            // 渲染多边形填充
+            if let polygon = overlay as? MKPolygon {
+                let renderer = MKPolygonRenderer(polygon: polygon)
+                renderer.fillColor = UIColor.systemGreen.withAlphaComponent(0.25)  // 半透明绿色填充
+                renderer.strokeColor = UIColor.systemGreen  // 绿色边框
+                renderer.lineWidth = 2  // 边框线宽
+                return renderer
+            }
+
             return MKOverlayRenderer(overlay: overlay)
         }
 
