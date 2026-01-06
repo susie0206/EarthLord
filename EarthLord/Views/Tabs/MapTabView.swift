@@ -27,6 +27,9 @@ struct MapTabView: View {
     /// 是否显示定位权限被拒绝的提示
     @State private var showPermissionDenied = false
 
+    /// 是否显示验证结果横幅 (Day17)
+    @State private var showValidationBanner = false
+
     // MARK: - Body
 
     var body: some View {
@@ -50,6 +53,11 @@ struct MapTabView: View {
             // 顶部叠加层：速度警告横幅
             if locationManager.speedWarning != nil {
                 speedWarningBanner
+            }
+
+            // 顶部叠加层：验证结果横幅 (Day17)
+            if showValidationBanner {
+                validationResultBanner
             }
 
             // 左上角叠加层：当前坐标显示
@@ -94,6 +102,23 @@ struct MapTabView: View {
                 }
             }
         }
+        .onChange(of: locationManager.isPathClosed) { oldValue, newValue in
+            // Day17: 监听闭环状态，闭环后根据验证结果显示横幅
+            if newValue {
+                // 闭环后延迟一点点，等待验证结果
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    withAnimation {
+                        showValidationBanner = true
+                    }
+                    // 3 秒后自动隐藏
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        withAnimation {
+                            showValidationBanner = false
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Speed Warning Banner
@@ -131,6 +156,49 @@ struct MapTabView: View {
         }
         .transition(.move(edge: .top).combined(with: .opacity))
         .animation(.easeInOut, value: locationManager.speedWarning)
+    }
+
+    // MARK: - Validation Result Banner (Day17)
+
+    /// 验证结果横幅（根据验证结果显示成功或失败）
+    private var validationResultBanner: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                // 结果图标
+                Image(systemName: locationManager.territoryValidationPassed
+                      ? "checkmark.circle.fill"
+                      : "xmark.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(.white)
+
+                // 结果文字
+                if locationManager.territoryValidationPassed {
+                    Text("圈地成功！领地面积: \(String(format: "%.0f", locationManager.calculatedArea))m²")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.white)
+                } else {
+                    Text(locationManager.territoryValidationError ?? "验证失败")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.white)
+                }
+
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(
+                // 根据验证结果选择背景色
+                locationManager.territoryValidationPassed ? Color.green : Color.red
+            )
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 2)
+            .padding(.horizontal, 20)
+            .padding(.top, 60)
+
+            Spacer()
+        }
+        .transition(.move(edge: .top).combined(with: .opacity))
+        .animation(.easeInOut, value: showValidationBanner)
     }
 
     // MARK: - Permission Denied Overlay
