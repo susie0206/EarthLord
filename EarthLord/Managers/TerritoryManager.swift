@@ -170,6 +170,61 @@ final class TerritoryManager {
         }
     }
 
+    /// 加载我的领地（仅加载当前用户的领地）
+    /// - Returns: 我的领地数组
+    /// - Throws: Error
+    func loadMyTerritories() async throws -> [Territory] {
+        print("📥 [TerritoryManager] 开始加载我的领地")
+
+        // 获取当前用户
+        guard let userId = try? await supabase.auth.session.user.id else {
+            print("❌ [TerritoryManager] 未登录")
+            throw TerritoryUploadError.authenticationRequired
+        }
+
+        do {
+            let territories: [Territory] = try await supabase
+                .from("territories")
+                .select()
+                .eq("user_id", value: userId.uuidString)
+                .eq("is_active", value: true)
+                .order("created_at", ascending: false)
+                .execute()
+                .value
+
+            print("✅ [TerritoryManager] 加载成功，共 \(territories.count) 个我的领地")
+            TerritoryLogger.shared.log("加载了 \(territories.count) 个我的领地", type: .info)
+            return territories
+        } catch {
+            print("❌ [TerritoryManager] 加载失败：\(error)")
+            TerritoryLogger.shared.log("加载我的领地失败: \(error.localizedDescription)", type: .error)
+            throw error
+        }
+    }
+
+    /// 删除领地
+    /// - Parameter territoryId: 领地ID
+    /// - Returns: 是否删除成功
+    func deleteTerritory(territoryId: String) async -> Bool {
+        print("🗑️ [TerritoryManager] 开始删除领地：\(territoryId)")
+
+        do {
+            try await supabase
+                .from("territories")
+                .delete()
+                .eq("id", value: territoryId)
+                .execute()
+
+            print("✅ [TerritoryManager] 领地删除成功")
+            TerritoryLogger.shared.log("领地删除成功", type: .success)
+            return true
+        } catch {
+            print("❌ [TerritoryManager] 领地删除失败：\(error)")
+            TerritoryLogger.shared.log("领地删除失败: \(error.localizedDescription)", type: .error)
+            return false
+        }
+    }
+
     // MARK: - Private Helper Methods
 
     /// 将坐标数组转换为 path JSON 格式

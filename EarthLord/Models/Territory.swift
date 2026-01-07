@@ -34,6 +34,12 @@ struct Territory: Codable, Identifiable {
     /// 创建时间（可选）
     let createdAt: String?
 
+    /// 开始圈地时间（可选）
+    let startedAt: String?
+
+    /// 完成圈地时间（可选）
+    let completedAt: String?
+
     /// JSON 解码时的键映射
     enum CodingKeys: String, CodingKey {
         case id
@@ -44,6 +50,8 @@ struct Territory: Codable, Identifiable {
         case pointCount = "point_count"
         case isActive = "is_active"
         case createdAt = "created_at"
+        case startedAt = "started_at"
+        case completedAt = "completed_at"
     }
 
     /// 将 path 数组转换为 CLLocationCoordinate2D 数组
@@ -53,5 +61,42 @@ struct Territory: Codable, Identifiable {
             guard let lat = point["lat"], let lon = point["lon"] else { return nil }
             return CLLocationCoordinate2D(latitude: lat, longitude: lon)
         }
+    }
+
+    // MARK: - Display Helpers
+
+    /// 格式化面积显示
+    var formattedArea: String {
+        if area >= 1_000_000 {
+            return String(format: "%.2f km²", area / 1_000_000)
+        } else {
+            return String(format: "%.0f m²", area)
+        }
+    }
+
+    /// 显示名称（如果未命名则返回默认值）
+    var displayName: String {
+        return name ?? "未命名领地"
+    }
+
+    /// 格式化创建时间
+    var formattedCreatedAt: String {
+        guard let createdAt = createdAt else { return "未知时间" }
+        return formatDate(createdAt)
+    }
+
+    /// 日期格式化辅助方法
+    private func formatDate(_ isoString: String) -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        guard let date = formatter.date(from: isoString) else {
+            return isoString
+        }
+
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateFormat = "yyyy-MM-dd HH:mm"
+        displayFormatter.timeZone = TimeZone.current
+        return displayFormatter.string(from: date)
     }
 }
