@@ -19,7 +19,13 @@ struct MapTabView: View {
     /// 领地管理器 (Day18)
     private let territoryManager = TerritoryManager.shared
 
+    /// 认证管理器 (Day18)
+    @EnvironmentObject private var authManager: AuthManager
+
     // MARK: - State Properties
+
+    /// 已加载的领地列表 (Day18)
+    @State private var territories: [Territory] = []
 
     /// 用户位置坐标
     @State private var userLocation: CLLocationCoordinate2D?
@@ -56,7 +62,9 @@ struct MapTabView: View {
                 trackingPath: $locationManager.pathCoordinates,
                 pathUpdateVersion: locationManager.pathUpdateVersion,
                 isTracking: locationManager.isTracking,
-                isPathClosed: locationManager.isPathClosed
+                isPathClosed: locationManager.isPathClosed,
+                territories: territories,  // Day18: 传入已加载的领地
+                currentUserId: authManager.currentUser?.id.uuidString  // Day18: 当前用户 ID
             )
             .ignoresSafeArea()
 
@@ -110,6 +118,10 @@ struct MapTabView: View {
         }
         .onAppear {
             handleLocationPermission()
+            // Day18: 加载所有领地
+            Task {
+                await loadTerritories()
+            }
         }
         .onChange(of: locationManager.authorizationStatus) { oldValue, newValue in
             handleLocationPermission()
@@ -486,6 +498,9 @@ struct MapTabView: View {
             locationManager.stopPathTracking()
             trackingStartTime = nil
 
+            // Day18: 刷新领地列表（显示刚上传的领地）
+            await loadTerritories()
+
             // 显示成功消息
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 withAnimation {
@@ -508,6 +523,18 @@ struct MapTabView: View {
         // 3秒后自动清除错误消息
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             uploadError = nil
+        }
+    }
+
+    /// 加载所有领地
+    private func loadTerritories() async {
+        do {
+            territories = try await territoryManager.loadAllTerritories()
+            TerritoryLogger.shared.log("加载了 \(territories.count) 个领地", type: .info)
+            print("🏠 [MapTabView] 加载了 \(territories.count) 个领地")
+        } catch {
+            TerritoryLogger.shared.log("加载领地失败: \(error.localizedDescription)", type: .error)
+            print("❌ [MapTabView] 加载领地失败：\(error.localizedDescription)")
         }
     }
 }

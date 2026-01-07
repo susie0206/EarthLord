@@ -32,6 +32,12 @@ struct MapViewRepresentable: UIViewRepresentable {
     /// 路径是否已闭合
     var isPathClosed: Bool
 
+    /// Day18: 已加载的领地列表
+    var territories: [Territory]
+
+    /// Day18: 当前用户 ID
+    var currentUserId: String?
+
     // MARK: - UIViewRepresentable
 
     /// 创建 MKMapView
@@ -87,6 +93,9 @@ struct MapViewRepresentable: UIViewRepresentable {
 
         // 更新 Coordinator 的 isPathClosed 状态（用于渲染颜色）
         context.coordinator.isPathClosed = isPathClosed
+
+        // Day18: 绘制领地（每次更新都重新绘制）
+        drawTerritories(on: mapView)
     }
 
     /// 创建 Coordinator（处理地图回调）
@@ -140,6 +149,46 @@ struct MapViewRepresentable: UIViewRepresentable {
             print("🎨 [MapView] 绘制闭环多边形，点数: \(trackingPath.count)")
         } else {
             print("🎨 [MapView] 绘制轨迹线，点数: \(trackingPath.count)")
+        }
+    }
+
+    // MARK: - Day18: Territory Drawing
+
+    /// 绘制所有领地（从云端加载的领地）
+    private func drawTerritories(on mapView: MKMapView) {
+        // 移除旧的领地多边形（保留路径轨迹）
+        let territoryOverlays = mapView.overlays.filter { overlay in
+            if let polygon = overlay as? MKPolygon {
+                return polygon.title == "mine" || polygon.title == "others"
+            }
+            return false
+        }
+        mapView.removeOverlays(territoryOverlays)
+
+        // 绘制每个领地
+        for territory in territories {
+            var coords = territory.toCoordinates()
+
+            // ⚠️ 中国大陆需要坐标转换（WGS-84 → GCJ-02）
+            coords = coords.map { coord in
+                CoordinateConverter.wgs84ToGcj02(coord)
+            }
+
+            guard coords.count >= 3 else { continue }
+
+            let polygon = MKPolygon(coordinates: coords, count: coords.count)
+
+            // ⚠️ 关键：比较 userId 时必须统一大小写！
+            // 数据库存的是小写 UUID，但 iOS 的 uuidString 返回大写
+            // 如果不转换，会导致自己的领地显示为橙色
+            let isMine = territory.userId.lowercased() == currentUserId?.lowercased()
+            polygon.title = isMine ? "mine" : "others"
+
+            mapView.addOverlay(polygon, level: .aboveRoads)
+        }
+
+        if !territories.isEmpty {
+            print("🏠 [MapView] 绘制了 \(territories.count) 个领地")
         }
     }
 
@@ -222,8 +271,22 @@ struct MapViewRepresentable: UIViewRepresentable {
             // 渲染多边形填充
             if let polygon = overlay as? MKPolygon {
                 let renderer = MKPolygonRenderer(polygon: polygon)
-                renderer.fillColor = UIColor.systemGreen.withAlphaComponent(0.25)  // 半透明绿色填充
-                renderer.strokeColor = UIColor.systemGreen  // 绿色边框
+
+                // Day18: 根据 title 区分不同类型的多边形
+                if polygon.title == "mine" {
+                    // 我的领地：绿色
+                    renderer.fillColor = UIColor.systemGreen.withAlphaComponent(0.25)
+                    renderer.strokeColor = UIColor.systemGreen
+                } else if polygon.title == "others" {
+                    // 他人领地：橙色
+                    renderer.fillColor = UIColor.systemOrange.withAlphaComponent(0.25)
+                    renderer.strokeColor = UIColor.systemOrange
+                } else {
+                    // 当前圈地轨迹：绿色（默认）
+                    renderer.fillColor = UIColor.systemGreen.withAlphaComponent(0.25)
+                    renderer.strokeColor = UIColor.systemGreen
+                }
+
                 renderer.lineWidth = 2  // 边框线宽
                 return renderer
             }
