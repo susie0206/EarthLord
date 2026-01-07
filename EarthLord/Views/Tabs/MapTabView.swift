@@ -16,6 +16,9 @@ struct MapTabView: View {
     /// 定位管理器
     @StateObject private var locationManager = LocationManager()
 
+    /// 领地管理器 (Day18)
+    private let territoryManager = TerritoryManager.shared
+
     // MARK: - State Properties
 
     /// 用户位置坐标
@@ -29,6 +32,18 @@ struct MapTabView: View {
 
     /// 是否显示验证结果横幅 (Day17)
     @State private var showValidationBanner = false
+
+    /// 是否正在上传 (Day18)
+    @State private var isUploading = false
+
+    /// 上传错误消息 (Day18)
+    @State private var uploadError: String?
+
+    /// 上传成功消息 (Day18)
+    @State private var uploadSuccess = false
+
+    /// 圈地开始时间 (Day18)
+    @State private var trackingStartTime: Date?
 
     // MARK: - Body
 
@@ -71,7 +86,7 @@ struct MapTabView: View {
                 Spacer()
             }
 
-            // 右下角叠加层：按钮组（圈地按钮 + 定位按钮）
+            // 右下角叠加层：按钮组（圈地按钮 + 确认登记按钮 + 定位按钮）
             VStack {
                 Spacer()
                 HStack {
@@ -79,6 +94,11 @@ struct MapTabView: View {
                     VStack(spacing: 12) {
                         // 圈地按钮
                         territoryButton
+
+                        // Day18: 确认登记按钮（仅在验证通过时显示）
+                        if locationManager.territoryValidationPassed && !isUploading {
+                            confirmButton
+                        }
 
                         // 定位按钮
                         locationButton
@@ -380,10 +400,12 @@ struct MapTabView: View {
             // 停止追踪
             print("🛑 [MapTabView] 用户点击停止圈地")
             locationManager.stopPathTracking()
+            trackingStartTime = nil  // Day18: 清除开始时间
         } else {
             // 开始追踪
             print("🚩 [MapTabView] 用户点击开始圈地")
             locationManager.clearPath()  // 清除旧路径
+            trackingStartTime = Date()  // Day18: 记录开始时间
             locationManager.startPathTracking()
         }
     }
@@ -399,6 +421,93 @@ struct MapTabView: View {
     private func openSettings() {
         if let url = URL(string: UIApplication.openSettingsURLString) {
             UIApplication.shared.open(url)
+        }
+    }
+
+    // MARK: - Day18: Territory Upload
+
+    /// 确认登记按钮
+    private var confirmButton: some View {
+        Button {
+            Task {
+                await uploadCurrentTerritory()
+            }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 16))
+
+                Text("确认登记领地")
+                    .font(.system(size: 14, weight: .semibold))
+            }
+            .foregroundColor(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color.green)
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+        }
+    }
+
+    /// 上传当前领地到服务器
+    private func uploadCurrentTerritory() async {
+        // ⚠️ 再次检查验证状态（防止并发问题）
+        guard locationManager.territoryValidationPassed else {
+            showUploadError("领地验证未通过，无法上传")
+            return
+        }
+
+        // 检查是否有开始时间
+        guard let startTime = trackingStartTime else {
+            showUploadError("缺少圈地开始时间")
+            return
+        }
+
+        // 设置上传状态
+        isUploading = true
+        uploadError = nil
+        uploadSuccess = false
+
+        print("📤 [MapTabView] 开始上传领地")
+
+        do {
+            // 上传领地
+            try await territoryManager.uploadTerritory(
+                coordinates: locationManager.pathCoordinates,
+                area: locationManager.calculatedArea,
+                startTime: startTime
+            )
+
+            // 上传成功
+            print("✅ [MapTabView] 领地上传成功")
+            uploadSuccess = true
+
+            // ⚠️ 关键：上传成功后必须停止追踪（防止重复上传）
+            locationManager.stopPathTracking()
+            trackingStartTime = nil
+
+            // 显示成功消息
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                withAnimation {
+                    showValidationBanner = false
+                }
+            }
+
+        } catch {
+            // 上传失败
+            print("❌ [MapTabView] 领地上传失败：\(error.localizedDescription)")
+            showUploadError(error.localizedDescription)
+        }
+
+        isUploading = false
+    }
+
+    /// 显示上传错误
+    private func showUploadError(_ message: String) {
+        uploadError = message
+        // 3秒后自动清除错误消息
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            uploadError = nil
         }
     }
 }

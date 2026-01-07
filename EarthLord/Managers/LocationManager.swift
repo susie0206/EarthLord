@@ -165,7 +165,7 @@ class LocationManager: NSObject, ObservableObject {
         recordPathPoint()
     }
 
-    /// 停止路径追踪
+    /// 停止路径追踪（并重置所有状态）
     func stopPathTracking() {
         print("🛑 [LocationManager] 停止路径追踪")
 
@@ -174,6 +174,21 @@ class LocationManager: NSObject, ObservableObject {
         // 停止定时器
         pathUpdateTimer?.invalidate()
         pathUpdateTimer = nil
+
+        // Day18: 重置路径和验证状态（防止重复上传）
+        pathCoordinates.removeAll()
+        pathUpdateVersion += 1
+        isPathClosed = false
+        speedWarning = nil
+        isOverSpeed = false
+        lastLocationTimestamp = nil
+
+        // 重置验证状态
+        territoryValidationPassed = false
+        territoryValidationError = nil
+        calculatedArea = 0
+
+        print("✅ [LocationManager] 所有状态已重置")
     }
 
     /// 清除路径
