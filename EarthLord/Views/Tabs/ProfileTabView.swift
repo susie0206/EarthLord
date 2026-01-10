@@ -21,6 +21,12 @@ struct ProfileTabView: View {
     /// 导航标题
     @State private var navigationTitle: String = ""
 
+    /// 领地数量
+    @State private var territoryCount: Int = 0
+
+    /// 领地管理器
+    private let territoryManager = TerritoryManager.shared
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -69,6 +75,7 @@ struct ProfileTabView: View {
             }
             .onAppear {
                 updateLocalizedTexts()
+                loadTerritoryCount()
             }
             .onReceive(NotificationCenter.default.publisher(for: .languageDidChange)) { _ in
                 updateLocalizedTexts()
@@ -78,6 +85,20 @@ struct ProfileTabView: View {
 
     private func updateLocalizedTexts() {
         navigationTitle = languageManager.localizedString(forKey: "幸存者档案")
+    }
+
+    /// 加载领地数量
+    private func loadTerritoryCount() {
+        Task {
+            do {
+                let territories = try await territoryManager.loadMyTerritories()
+                await MainActor.run {
+                    territoryCount = territories.count
+                }
+            } catch {
+                print("❌ [ProfileTabView] 加载领地数量失败: \(error)")
+            }
+        }
     }
 
     // MARK: - 头部背景
@@ -222,7 +243,7 @@ struct ProfileTabView: View {
                 statisticCard(
                     icon: "map.fill",
                     titleKey: "领地",
-                    value: "0",
+                    value: "\(territoryCount)",
                     color: ApocalypseTheme.primary
                 )
 
