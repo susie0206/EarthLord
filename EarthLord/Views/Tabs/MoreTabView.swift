@@ -97,6 +97,23 @@ struct MoreTabView: View {
                         }
                         .padding(.vertical, 4)
                     }
+
+                    NavigationLink(destination: TerritoryLoggerView()) {
+                        HStack {
+                            Image(systemName: "doc.text.magnifyingglass")
+                                .foregroundColor(.orange)
+                                .frame(width: 30)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("圈地日志")
+                                    .font(.body)
+                                Text("查看圈地调试日志")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
                 } header: {
                     LocalizedText("开发工具")
                 }

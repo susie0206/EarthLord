@@ -301,38 +301,63 @@ class LocationManager: NSObject, ObservableObject {
     /// - Returns: true 表示速度正常，false 表示超速
     private func validateMovementSpeed(newLocation: CLLocation) -> Bool {
         // 第一个点，无需检测速度
-        guard let lastCoordinate = pathCoordinates.last,
-              let lastTimestamp = lastLocationTimestamp else {
+        guard pathCoordinates.count > 0 else {
             lastLocationTimestamp = Date()
             return true
         }
 
-        // 计算距离
-        let lastLocation = CLLocation(latitude: lastCoordinate.latitude, longitude: lastCoordinate.longitude)
-        let distance = newLocation.distance(from: lastLocation)  // 单位：米
+        // ⚠️ 优先使用系统提供的速度值（已过滤 GPS 漂移）
+        // CLLocation.speed 单位是 m/s，需要转换为 km/h
+        // 速度 < 0 表示无效（静止或 GPS 信号差）
+        var speedKmh: Double = 0
 
-        // 计算时间差
-        let currentTimestamp = Date()
-        let timeDiff = currentTimestamp.timeIntervalSince(lastTimestamp)  // 单位：秒
+        if newLocation.speed >= 0 {
+            // 系统速度有效，直接使用（已过滤漂移）
+            speedKmh = newLocation.speed * 3.6
+            print("🚗 [LocationManager] 系统速度: \(String(format: "%.1f", speedKmh)) km/h (精度: \(String(format: "%.1f", newLocation.horizontalAccuracy))m)")
+        } else {
+            // 系统速度无效，检查 GPS 精度
+            // 如果精度太差（> 20m），认为静止
+            if newLocation.horizontalAccuracy > 20 {
+                print("📍 [LocationManager] GPS 精度差 (\(String(format: "%.1f", newLocation.horizontalAccuracy))m)，视为静止")
+                speedKmh = 0
+            } else {
+                // 精度尚可，使用手动计算（作为后备）
+                guard let lastCoordinate = pathCoordinates.last,
+                      let lastTimestamp = lastLocationTimestamp else {
+                    lastLocationTimestamp = Date()
+                    return true
+                }
 
-        // 避免除以 0
-        guard timeDiff > 0 else {
-            lastLocationTimestamp = currentTimestamp
-            return true
+                let lastLocation = CLLocation(latitude: lastCoordinate.latitude, longitude: lastCoordinate.longitude)
+                let distance = newLocation.distance(from: lastLocation)
+
+                let currentTimestamp = Date()
+                let timeDiff = currentTimestamp.timeIntervalSince(lastTimestamp)
+
+                guard timeDiff > 0 else {
+                    lastLocationTimestamp = currentTimestamp
+                    return true
+                }
+
+                // ⚠️ 新增：如果距离太小（< 5m），可能是 GPS 漂移，视为静止
+                if distance < 5 {
+                    print("📍 [LocationManager] 距离太小 (\(String(format: "%.1f", distance))m)，可能是 GPS 漂移，视为静止")
+                    speedKmh = 0
+                } else {
+                    speedKmh = (distance / timeDiff) * 3.6
+                    print("🚗 [LocationManager] 手动计算速度: \(String(format: "%.1f", speedKmh)) km/h (距离: \(String(format: "%.1f", distance))m, 时间: \(String(format: "%.1f", timeDiff))s)")
+                }
+            }
         }
 
-        // 计算速度（km/h）
-        let speed = (distance / timeDiff) * 3.6
-
-        print("🚗 [LocationManager] 速度检测: \(String(format: "%.1f", speed)) km/h (距离: \(String(format: "%.1f", distance))m, 时间: \(String(format: "%.1f", timeDiff))s)")
-
         // 更新时间戳
-        lastLocationTimestamp = currentTimestamp
+        lastLocationTimestamp = Date()
 
         // 速度 > 30 km/h：暂停追踪
-        if speed > 30 {
+        if speedKmh > 30 {
             DispatchQueue.main.async {
-                self.speedWarning = "速度过快 (\(String(format: "%.1f", speed)) km/h)，已暂停追踪"
+                self.speedWarning = "速度过快 (\(String(format: "%.1f", speedKmh)) km/h)，已暂停追踪"
                 self.isOverSpeed = true
             }
             print("⚠️ [LocationManager] 速度超过 30 km/h，暂停追踪")
@@ -341,9 +366,9 @@ class LocationManager: NSObject, ObservableObject {
         }
 
         // 速度 > 15 km/h：警告但继续追踪
-        if speed > 15 {
+        if speedKmh > 15 {
             DispatchQueue.main.async {
-                self.speedWarning = "速度较快 (\(String(format: "%.1f", speed)) km/h)，请放慢速度"
+                self.speedWarning = "速度较快 (\(String(format: "%.1f", speedKmh)) km/h)，请放慢速度"
                 self.isOverSpeed = true
             }
             print("⚠️ [LocationManager] 速度超过 15 km/h，发出警告")
